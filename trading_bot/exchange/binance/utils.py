@@ -10,7 +10,6 @@ def process_binance_order_book(
     bids = []
     asks = []
 
-
     for [price, quantity] in order_book.bids:
         bids.append(Order(instrument, quantity, price, "open"))
 
@@ -18,3 +17,9 @@ def process_binance_order_book(
         asks.append(Order(instrument, quantity, price, "open"))
 
     return OrderBook(bids, asks, instrument)
+
+
+def normalize_binance_symbol(symbol: str) -> str:
+    """Normalize a Binance symbol to the format used by the exchange"""
+
+    return symbol.replace("/", "").upper().replace("USD", "USDT")
