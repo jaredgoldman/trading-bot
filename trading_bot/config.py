@@ -20,5 +20,5 @@ class Config:
         for symbol in cls.INSTRUMENTS:
             base_asset, quote_asset = symbol.split("_")
             name = f"{base_asset}{quote_asset}"
-            instruments.append(Instrument(base_asset, quote_asset, name))
+            instruments.append(Instrument(name, base_asset, quote_asset))
         return instruments

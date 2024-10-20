@@ -10,6 +10,5 @@ def initialize_market(instruments: list[Instrument]):
     """Initialize the market by fetching order books from all exchanges"""
     for exchange in exchanges:
         for instrument in instruments:
-            order_books[exchange.__name__][instrument.name] = exchange.get_order_book(
-                instrument
-            )
+            exchange.get_orderbook_ws(instrument)
+
