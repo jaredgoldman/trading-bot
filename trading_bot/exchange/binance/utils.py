@@ -11,10 +11,10 @@ def process_binance_order_book(
     asks = []
 
     for [price, quantity] in order_book.bids:
-        bids.append(Order(instrument, quantity, price, "open"))
+        bids.append(Order(instrument, float(quantity), float(price), "open"))
 
     for [price, quantity] in order_book.asks:
-        asks.append(Order(instrument, quantity, price, "open"))
+        asks.append(Order(instrument, float(quantity), float(price), "open"))
 
     return OrderBook(bids, asks, instrument)
 

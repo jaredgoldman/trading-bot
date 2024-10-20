@@ -11,39 +11,24 @@ T = TypeVar("T")
 class Exchange(ABC):
     """Exchange abstract class for integrations"""
 
+    base_url: ClassVar[str]
     orderbook_ws_endpoint: ClassVar[str]
 
     def __init__(self):
         if hasattr(self.__class__, "orderbook_ws_endpoint"):
             self.ws_manager = WebSocketManager(self.__class__.orderbook_ws_endpoint)
 
-    # @abstractmethod
-    # def buy(self, asset: str, quantity: float, price: float) -> Order:
-    #     """execute a limit buy order"""
-
-    # @abstractmethod
-    # def sell(self, asset: str, quantity: float, price: float) -> Order:
-    #     """execute a limit sell order"""
-
-    @abstractmethod
-    def get_order_book(self, instrument: Instrument) -> OrderBook | None:
-        """fetch an exchange orderbook"""
-
-    # @abstractmethod
-    # def get_balance(self, asset: str) -> float:
-    #     """fetch an exchange balance"""
-
-    # @abstractmethod
-    # def get_assets(self) -> list[Asset]:
-    #     """fetch exchange assets"""
-
-    # @abstractmethod
-    # def get_asset(self, asset: str) -> Asset:
-    #     """fetch exchange assets"""
-
     def get_name(self) -> str:
         """return the exchange name"""
         return self.__class__.__name__.lower()
+
+    @abstractmethod
+    def get_orderbook_snapshot(self, instrument: Instrument) -> OrderBook | None:
+        """fetch an exchange orderbook"""
+
+    @abstractmethod
+    def get_orderbook_ws(self, instrument: Instrument) -> OrderBook | None:
+        """fetch an exchange orderbook"""
 
     def request(
         self, method: str, endpoint: str, response_type: Callable[[Any], T], **kwargs
@@ -68,13 +53,3 @@ class Exchange(ABC):
         except ValueError as e:
             # Handle JSON decoding errors
             raise RuntimeError(f"Failed to parse response: {str(e)}") from e
-
-    def ws_subscribe(self, stream: str, callback: Callable[[Any], None]):
-        """Subscribe to a websocket stream"""
-
-        self.ws_manager.subscribe(stream, callback)
-
-    def ws_unsubscribe(self, stream: str):
-        """Unsubscribe from a websocket stream"""
-
-        self.ws_manager.unsubscribe(stream)
