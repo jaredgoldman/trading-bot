@@ -29,16 +29,16 @@ class Binance(Exchange):
 
         return process_binance_order_book(order_book, instrument)
 
-    def get_orderbook_ws(self, instrument: Instrument):
+    def update_orderbook_ws(self, instrument: Instrument):
         """Fetch binance orderbook via websocket"""
 
         symbol = normalize_binance_symbol(instrument.name)
 
         def extract_orderbook(data):
-            order_book = BinanceOrderBook(
+            b_order_book = BinanceOrderBook(
                 bids=data["bids"], asks=data["asks"], lastUpdateId=data["lastUpdateId"]
             )
-            order_book = process_binance_order_book(order_book, instrument)
-            logger.info(f"Order book for {instrument.name}: {order_book}")
+            order_book = process_binance_order_book(b_order_book, instrument)
+            self.update_order_book(order_book)
 
         self.ws_manager.subscribe(f"{symbol.lower()}@depth5", extract_orderbook)

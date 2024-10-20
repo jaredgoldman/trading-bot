@@ -26,7 +26,6 @@ class WebSocketManager:
     current_stream: str
 
     def connect(self):
-
         def on_message(ws, message):
             """
             This is a hacky way to process Binance order book data which sends

@@ -22,3 +22,6 @@ class Config:
             name = f"{base_asset}{quote_asset}"
             instruments.append(Instrument(name, base_asset, quote_asset))
         return instruments
+
+    buy_threshold = 0.5
+    sell_threshold = 0.5

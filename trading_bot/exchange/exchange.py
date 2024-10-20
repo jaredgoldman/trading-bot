@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import TypeVar, Callable, Any, ClassVar
 from trading_bot.types import Instrument, OrderBook
 from trading_bot.utils.ws import WebSocketManager
+from trading_bot.main import global_state
 import requests
 
 
@@ -27,8 +28,12 @@ class Exchange(ABC):
         """fetch an exchange orderbook"""
 
     @abstractmethod
-    def get_orderbook_ws(self, instrument: Instrument) -> OrderBook | None:
+    def update_orderbook_ws(self, instrument: Instrument) -> OrderBook | None:
         """fetch an exchange orderbook"""
+
+    def update_order_book(self, order_book: OrderBook):
+        """update the global state with the order book"""
+        global_state.update_order_book(order_book, self.get_name())
 
     def request(
         self, method: str, endpoint: str, response_type: Callable[[Any], T], **kwargs
