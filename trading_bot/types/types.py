@@ -27,3 +27,11 @@ class OrderBook:
     bids: list[Order]
     asks: list[Order]
     instrument: Instrument
+
+@dataclass
+class OrderBookUpdate:
+    bids: list[Order]
+    asks: list[Order]
+    instrument: Instrument
+    timestamp: int
+

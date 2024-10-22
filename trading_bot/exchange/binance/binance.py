@@ -1,8 +1,9 @@
-from trading_bot.types import Instrument
+from trading_bot.types import Instrument, Order, OrderBookUpdate
 from .types import BinanceOrderBook
 from ..exchange import Exchange
 from .utils import normalize_binance_symbol, process_binance_order_book
 import logging
+import pendulum
 
 logger = logging.getLogger(__name__)
 
@@ -35,10 +36,18 @@ class Binance(Exchange):
         symbol = normalize_binance_symbol(instrument.name)
 
         def extract_orderbook(data):
-            b_order_book = BinanceOrderBook(
-                bids=data["bids"], asks=data["asks"], lastUpdateId=data["lastUpdateId"]
+            """Extract orderbook data from websocket message and notify observers"""
+            bids = [
+                Order(instrument, float(qty), float(price), "open")
+                for price, qty in data["bids"]
+            ]
+            asks = [
+                Order(instrument, float(qty), float(price), "open")
+                for price, qty in data["asks"]
+            ]
+            order_book = OrderBookUpdate(
+                bids, asks, instrument, pendulum.now().int_timestamp
             )
-            order_book = process_binance_order_book(b_order_book, instrument)
-            self.update_order_book(order_book)
+            self.notify_orderbook_update(order_book)
 
         self.ws_manager.subscribe(f"{symbol.lower()}@depth5", extract_orderbook)

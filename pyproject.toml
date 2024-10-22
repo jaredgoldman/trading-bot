@@ -11,6 +11,7 @@ python-dotenv = "^1.0.1"
 requests = "^2.32.3"
 pytest = "^8.3.3"
 websocket-client = "^1.8.0"
+pendulum = "^3.0.0"
 
 
 [build-system]
