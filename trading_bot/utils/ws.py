@@ -1,7 +1,7 @@
+from typing import Callable, Any, Dict, TypeVar
 import websocket
 import json
 import threading
-from typing import Callable, Any, Dict, TypeVar
 from queue import Queue
 import queue
 import logging

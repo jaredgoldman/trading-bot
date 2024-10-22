@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Callable, Any, ClassVar, Set
-from trading_bot.types.types import Instrument, OrderBook, OrderBookUpdate
-from trading_bot.utils.observer import MarketDataObserver
+from trading_bot.types.market import Instrument, OrderBook, OrderBookUpdate
+from trading_bot.types.observer import MarketDataObserver
 from trading_bot.utils.ws import WebSocketManager
 import requests
 

@@ -12,6 +12,8 @@ class Instrument:
     name: str
     base_asset: str
     quote_asset: str
+    buy_threshold: float
+    sell_threshold: float
 
 
 @dataclass(order=True)
@@ -28,10 +30,10 @@ class OrderBook:
     asks: list[Order]
     instrument: Instrument
 
+
 @dataclass
 class OrderBookUpdate:
     bids: list[Order]
     asks: list[Order]
     instrument: Instrument
     timestamp: int
-

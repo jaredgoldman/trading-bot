@@ -1,3 +1,4 @@
+from trading_bot.types.market import Instrument, OrderBookUpdate
 from trading_bot.types.observer import MarketDataObserver
 import pendulum
 import logging
@@ -11,8 +12,8 @@ logger = logging.getLogger(__name__)
 class Logger(MarketDataObserver):
     """Logger class for logging main events"""
 
-    def on_orderbook_update(self, update):
+    def on_orderbook_update(self, update: OrderBookUpdate):
         """Log orderbook update"""
-        logger.info(
+        logger.debug(
             f"{update.instrument.name} - {pendulum.from_timestamp(update.timestamp)} - {update.bids[:5]} - {update.asks[:5]}"
         )

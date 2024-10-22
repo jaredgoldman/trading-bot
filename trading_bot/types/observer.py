@@ -1,6 +1,6 @@
 from typing import Protocol
 from abc import abstractmethod
-from trading_bot.types.types import OrderBookUpdate
+from trading_bot.types.market import OrderBookUpdate
 
 
 class MarketDataObserver(Protocol):

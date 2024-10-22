@@ -1,5 +1,5 @@
 from trading_bot.exchange.binance.types import BinanceOrderBook
-from trading_bot.types import OrderBook, Order, Instrument
+from trading_bot.types.market import OrderBook, Order, Instrument
 
 
 def process_binance_order_book(
