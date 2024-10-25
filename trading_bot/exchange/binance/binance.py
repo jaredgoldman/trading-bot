@@ -1,6 +1,5 @@
-from trading_bot.types.market import Instrument, Order, OrderBookUpdate
-from .types import BinanceOrderBook
-from ..exchange import Exchange
+from trading_bot.types import Instrument, Order, OrderBookUpdate
+from trading_bot.exchange import Exchange, BinanceOrderBook
 from .utils import normalize_binance_symbol, process_binance_order_book
 import logging
 import pendulum

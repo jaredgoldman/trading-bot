@@ -1,10 +1,9 @@
-from trading_bot.exchange.binance.binance import Binance
-from trading_bot.exchange.exchange import Exchange
+from trading_bot.exchange import Binance, Exchange
 from trading_bot.execution import Execution
-from trading_bot.types.market import Instrument
+from trading_bot.types import Instrument
 from trading_bot.config import Config
+from trading_bot.utils import Logger
 from threading import Timer
-from trading_bot.utils.logger import Logger
 import time
 
 

@@ -1,5 +1,5 @@
 from .types import DeribitOrderBook
-from ..exchange import Exchange
+from trading_bot.exchange import Exchange
 import requests
 
 

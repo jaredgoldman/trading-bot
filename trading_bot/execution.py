@@ -1,29 +1,33 @@
-from trading_bot.types.observer import MarketDataObserver
-from trading_bot.types.market import OrderBookUpdate
+from trading_bot.types import OrderBookUpdate, MarketDataObserver
+from trading_bot.config import Config
+from trading_bot.risk import RiskManager
+from trading_bot.strategy import SpotStrategy
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 class Execution(MarketDataObserver):
-    def maybe_execute_buy(self, top_bid: float, buy_threshold: float):
-        if top_bid >= buy_threshold:
-            logger.info(f"Buy at {top_bid}")
+    """Execution class for the trading bot"""
 
-    def maybe_execute_sell(self, top_ask: float, sell_threshold: float):
-        if top_ask <= sell_threshold:
-            logger.info(f"Sell at {top_ask}")
+    def __init__(self):
+        # Initialize risk manager with example parameters
+        risk_manager = RiskManager(
+            max_position_size=1.0, max_drawdown=2.0, stop_loss_pct=1.0
+        )
+
+        # Initialize strategy with risk manager
+        self.spot_strategy = SpotStrategy(
+            risk_manager=risk_manager,
+            min_spread=0.001,  # 0.1% minimum spread
+            max_spread=0.005,  # 0.5% maximum spread
+        )
 
     def on_orderbook_update(self, update: OrderBookUpdate):
+        if Config.STRATEGIES["spot"]:
+            # Analyze market and get trading signals
+            signal = self.spot_strategy.analyze_market(update)
 
-        instrument = update.instrument
-        top_bid = update.bids[0].price
-        top_ask = update.asks[0].price
-        spread = top_ask - top_bid
-
-        self.maybe_execute_buy(top_bid, instrument.buy_threshold)
-        self.maybe_execute_sell(top_ask, instrument.sell_threshold)
-
-        logger.info(
-            f"Instrument: {instrument.name}, spread: {spread}, Top bid: {top_bid}, Top ask: {top_ask}"
-        )
+            # Check risk management and execute trades
+            self.spot_strategy.check_exit_conditions(update)
+            self.spot_strategy.execute_trade(signal, update)

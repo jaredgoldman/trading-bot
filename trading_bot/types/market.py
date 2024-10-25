@@ -37,3 +37,10 @@ class OrderBookUpdate:
     asks: list[Order]
     instrument: Instrument
     timestamp: int
+
+
+@dataclass
+class Position:
+    size: float
+    entry_price: float
+    side: str  # 'long' or 'short'

@@ -1,21 +1,39 @@
 from dataclasses import dataclass
 from typing import Dict, List, Any
-from trading_bot.types.market import Instrument
+from trading_bot.types import Instrument
 
 
 @dataclass
 class InstrumentConfig:
+    """"""
+
     buy_threshold: float
     sell_threshold: float
+    min_size_usd: float
+    max_size_usd: float
+    # we could also add book depth here
 
 
 class Config:
     """Configuration class for the trading bot"""
 
     INSTRUMENTS: Dict[str, InstrumentConfig] = {
-        "BTC_USD": InstrumentConfig(buy_threshold=67434, sell_threshold=67435),
-        "ETH_USD": InstrumentConfig(buy_threshold=2647, sell_threshold=2647),
+        "BTC_USD": InstrumentConfig(
+            buy_threshold=67434,
+            sell_threshold=67450,
+            min_size_usd=30,
+            max_size_usd=100,
+        ),
+        "ETH_USD": InstrumentConfig(
+            buy_threshold=2647, sell_threshold=2647, min_size_usd=30, max_size_usd=100
+        ),
     }
+
+    STRATEGIES: Dict[str, bool] = {"spot": True}
+
+    @classmethod
+    def get_strategies(cls):
+        return cls.STRATEGIES
 
     @classmethod
     def as_dict(cls) -> Dict[str, Any]:
@@ -41,7 +59,3 @@ class Config:
                 )
             )
         return instruments
-
-    @classmethod
-    def get_thresholds(cls, symbol: str) -> InstrumentConfig:
-        return cls.INSTRUMENTS[symbol]

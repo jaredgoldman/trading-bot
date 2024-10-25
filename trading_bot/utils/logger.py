@@ -1,5 +1,4 @@
-from trading_bot.types.market import Instrument, OrderBookUpdate
-from trading_bot.types.observer import MarketDataObserver
+from trading_bot.types import OrderBookUpdate, MarketDataObserver
 import pendulum
 import logging
 
