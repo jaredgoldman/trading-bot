@@ -44,3 +44,24 @@ class Position:
     size: float
     entry_price: float
     side: str  # 'long' or 'short'
+
+
+@dataclass
+class InstrumentConfig:
+    buy_threshold: float
+    sell_threshold: float
+    min_size_usd: float
+    max_size_usd: float
+
+
+@dataclass
+class StrategyConfig:
+    strategy: str
+    enabled: bool
+    min_spread: float
+    max_spread: float
+
+@dataclass
+class Signal:
+    action: str | None
+    size: float

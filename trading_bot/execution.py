@@ -24,7 +24,7 @@ class Execution(MarketDataObserver):
         )
 
     def on_orderbook_update(self, update: OrderBookUpdate):
-        if Config.STRATEGIES["spot"]:
+        if Config.STRATEGIES["spot"].enabled:
             # Analyze market and get trading signals
             signal = self.spot_strategy.analyze_market(update)
 

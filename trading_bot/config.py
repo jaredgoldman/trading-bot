@@ -1,17 +1,5 @@
-from dataclasses import dataclass
 from typing import Dict, List, Any
-from trading_bot.types import Instrument
-
-
-@dataclass
-class InstrumentConfig:
-    """"""
-
-    buy_threshold: float
-    sell_threshold: float
-    min_size_usd: float
-    max_size_usd: float
-    # we could also add book depth here
+from trading_bot.types import Instrument, InstrumentConfig, StrategyConfig
 
 
 class Config:
@@ -25,11 +13,18 @@ class Config:
             max_size_usd=100,
         ),
         "ETH_USD": InstrumentConfig(
-            buy_threshold=2647, sell_threshold=2647, min_size_usd=30, max_size_usd=100
+            buy_threshold=2647,
+            sell_threshold=2647,
+            min_size_usd=30,
+            max_size_usd=100,
         ),
     }
 
-    STRATEGIES: Dict[str, bool] = {"spot": True}
+    STRATEGIES: dict[str, StrategyConfig] = {
+        "spot": StrategyConfig(
+            strategy="spot", enabled=True, min_spread=0.001, max_spread=0.005
+        ),
+    }
 
     @classmethod
     def get_strategies(cls):

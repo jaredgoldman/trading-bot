@@ -2,6 +2,7 @@ from trading_bot.types import Position
 
 
 class RiskManager:
+    """Risk manager class for managing risk and position sizing"""
     def __init__(
         self, max_position_size: float, max_drawdown: float, stop_loss_pct: float
     ):
