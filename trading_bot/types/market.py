@@ -25,13 +25,6 @@ class Order:
 
 
 @dataclass
-class OrderBook:
-    bids: list[Order]
-    asks: list[Order]
-    instrument: Instrument
-
-
-@dataclass
 class OrderBookUpdate:
     bids: list[Order]
     asks: list[Order]
@@ -60,6 +53,7 @@ class StrategyConfig:
     enabled: bool
     min_spread: float
     max_spread: float
+
 
 @dataclass
 class Signal:

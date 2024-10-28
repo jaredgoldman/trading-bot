@@ -17,10 +17,12 @@ def add_observers(exchange: Exchange):
 
 
 def initialize_exchanges():
+    """Initialize each exchange, add observers, and subscribe to order"""
     for exchange in exchanges:
         instruments = Config.process_instruments(exchange.normalize_symbol)
         exchange_instance = exchange(instruments)
         add_observers(exchange_instance)
+        # wait for ws client to boot
         time.sleep(1)
         exchange_instance.subscribe_orderbook()
 
