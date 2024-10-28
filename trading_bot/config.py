@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Dict, Callable, Any
 from trading_bot.types import Instrument, InstrumentConfig, StrategyConfig
 
 
@@ -39,18 +39,24 @@ class Config:
         }
 
     @classmethod
-    def process_instruments(cls) -> List[Instrument]:
-        instruments = []
+    def process_instruments(
+        cls, normalize_symbol: Callable[[str], str]
+    ) -> dict[str, Instrument]:
+        instruments = {}
         for symbol, config in cls.INSTRUMENTS.items():
             base_asset, quote_asset = symbol.split("_")
-            name = f"{base_asset}{quote_asset}"
-            instruments.append(
-                Instrument(
-                    name,
-                    base_asset,
-                    quote_asset,
-                    config.buy_threshold,
-                    config.sell_threshold,
-                )
+            name = normalize_symbol(f"{base_asset}{quote_asset}")
+            base_asset = normalize_symbol(base_asset)
+            quote_asset = normalize_symbol(quote_asset)
+            instruments.update(
+                {
+                    name: Instrument(
+                        name,
+                        base_asset,
+                        quote_asset,
+                        config.buy_threshold,
+                        config.sell_threshold,
+                    )
+                }
             )
         return instruments

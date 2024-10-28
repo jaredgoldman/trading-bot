@@ -1,6 +1,8 @@
 from trading_bot.types import Instrument, Order, OrderBookUpdate
-from trading_bot.exchange import Exchange, BinanceOrderBook
-from .utils import normalize_binance_symbol, process_binance_order_book
+from ..exchange import Exchange
+from .types import BinanceOrderBook
+from .utils import process_binance_order_book
+from typing import List
 import logging
 import pendulum
 
@@ -18,35 +20,44 @@ class Binance(Exchange):
 
         endpoint = f"{self.base_url}/api/v3/depth"
 
-        symbol = normalize_binance_symbol(instrument.name)
-
         order_book = self.request(
             "GET",
             endpoint,
             BinanceOrderBook,
-            params={"symbol": symbol, "limit": depth},
+            params={"symbol": instrument.name, "limit": depth},
         )
 
         return process_binance_order_book(order_book, instrument)
 
-    def update_orderbook_ws(self, instrument: Instrument):
-        """Fetch binance orderbook via websocket"""
+    def extract_stream_names(self, instruments: dict[str, Instrument]) -> List[str]:
+        return [
+            instrument.name.lower() + "@depth" for instrument in instruments.values()
+        ]
 
-        symbol = normalize_binance_symbol(instrument.name)
-
-        def extract_orderbook(data):
-            """Extract orderbook data from websocket message and notify observers"""
-            bids = [
-                Order(instrument, float(qty), float(price), "open")
-                for price, qty in data["bids"]
-            ]
-            asks = [
-                Order(instrument, float(qty), float(price), "open")
-                for price, qty in data["asks"]
-            ]
-            order_book = OrderBookUpdate(
-                bids, asks, instrument, pendulum.now().int_timestamp
+    def extract_orderbook_and_notify(self, data):
+        update_instrument = data.get("s")
+        if (instrument := self.instruments.get(update_instrument)) is None:
+            logger.error(
+                f"Received orderbook update for unknown instrument: {update_instrument}"
             )
-            self.notify_orderbook_update(order_book)
+            return
 
-        self.ws_manager.subscribe(f"{symbol.lower()}@depth5", extract_orderbook)
+        bids = [
+            Order(self.instruments[update_instrument], float(qty), float(price), "open")
+            for price, qty in data["b"]
+        ]
+
+        asks = [
+            Order(self.instruments[update_instrument], float(qty), float(price), "open")
+            for price, qty in data["a"]
+        ]
+
+        order_book = OrderBookUpdate(
+            bids, asks, instrument, pendulum.now().int_timestamp
+        )
+
+        self.notify_orderbook_update(order_book)
+
+    @staticmethod
+    def normalize_symbol(symbol: str) -> str:
+        return symbol.replace("/", "").upper().replace("USD", "USDT")

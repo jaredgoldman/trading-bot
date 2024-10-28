@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Callable, Any, ClassVar, Set
+from typing import TypeVar, Callable, Any, ClassVar, Set, List
 from trading_bot.types import (
     Instrument,
     OrderBook,
@@ -18,8 +18,10 @@ class Exchange(ABC):
 
     base_url: ClassVar[str]
     orderbook_ws_endpoint: ClassVar[str]
+    instruments: dict[str, Instrument]
 
-    def __init__(self):
+    def __init__(self, instruments: dict[str, Instrument]):
+        self.instruments = instruments
         self.observers: Set[MarketDataObserver] = set()
         self.ws_manager = WebSocketManager(self.__class__.orderbook_ws_endpoint)
 
@@ -40,11 +42,25 @@ class Exchange(ABC):
     def get_orderbook_snapshot(self, instrument: Instrument) -> OrderBook | None:
         """fetch an exchange orderbook"""
 
+    @staticmethod
     @abstractmethod
-    def update_orderbook_ws(self, instrument: Instrument):
-        """
-        stream an exchange orderbook and notify_orderbook_update with results
-        """
+    def normalize_symbol(symbol: str) -> str:
+        """normalize a symbol to the exchange format"""
+
+    @abstractmethod
+    def extract_stream_names(self, instruments: dict[str, Instrument]) -> List[str]:
+        """extract stream names from instruments"""
+
+    @abstractmethod
+    def extract_orderbook_and_notify(self, data: Any):
+        """extract orderbook data from a websocket message"""
+
+    def subscribe_orderbook(self):
+        """subscribe to the exchange orderbook and notify observers"""
+        self.ws_manager.subscribe(
+            self.extract_stream_names(self.instruments),
+            self.extract_orderbook_and_notify,
+        )
 
     def request(
         self, method: str, endpoint: str, response_type: Callable[[Any], T], **kwargs
