@@ -30,7 +30,7 @@ class Exchange(ABC):
 
     @abstractmethod
     def extract_stream_names(self, instruments: dict[str, Instrument]) -> List[str]:
-        """extract stream names from instruments"""
+        """extract stream names from configuration instruments"""
 
     @abstractmethod
     def extract_orderbook_and_notify(self, data: Any):

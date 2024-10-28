@@ -12,6 +12,10 @@ class Binance(Exchange):
 
     orderbook_ws_endpoint = "wss://stream.binance.com:9443/ws"
 
+    @staticmethod
+    def normalize_symbol(symbol: str) -> str:
+        return symbol.replace("/", "").upper().replace("USD", "USDT")
+
     def extract_stream_names(self, instruments: dict[str, Instrument]) -> List[str]:
         return [
             instrument.name.lower() + "@depth" for instrument in instruments.values()
@@ -29,7 +33,6 @@ class Binance(Exchange):
             Order(self.instruments[update_instrument], float(qty), float(price), "open")
             for price, qty in data["b"]
         ]
-
         asks = [
             Order(self.instruments[update_instrument], float(qty), float(price), "open")
             for price, qty in data["a"]
@@ -40,7 +43,3 @@ class Binance(Exchange):
         )
 
         self.notify_orderbook_update(order_book)
-
-    @staticmethod
-    def normalize_symbol(symbol: str) -> str:
-        return symbol.replace("/", "").upper().replace("USD", "USDT")

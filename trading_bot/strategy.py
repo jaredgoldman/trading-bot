@@ -25,11 +25,12 @@ class BaseStrategy(ABC):
 
     def execute_trade(self, signal: Signal, update: OrderBookUpdate) -> None:
         """Execute trade based on signal and risk management rules"""
+
         if signal.action == "buy" and (
             self.position is None or self.position.side == "short"
         ):
             size = signal.size or 0
-            if self.risk_manager.check_position_size(size):
+            if self.risk_manager.check_position_size(size, update.instrument):
                 # Implement actual trade execution logic here
                 self.position = Position(
                     size=size, entry_price=update.asks[0].price, side="long"
@@ -40,7 +41,7 @@ class BaseStrategy(ABC):
             self.position is None or self.position.side == "long"
         ):
             size = signal.size or 0
-            if self.risk_manager.check_position_size(size):
+            if self.risk_manager.check_position_size(size, update.instrument):
                 # Implement actual trade execution logic here
                 self.position = Position(
                     size=size, entry_price=update.bids[0].price, side="short"
@@ -59,7 +60,9 @@ class BaseStrategy(ABC):
             else update.asks[0].price
         )
 
-        if self.risk_manager.should_stop_loss(self.position, current_price):
+        if self.risk_manager.should_stop_loss(
+            self.position, current_price, update.instrument
+        ):
             # Implement actual exit logic here
             logger.warning(f"Stop loss triggered for position: {self.position}")
             self.trades.append(self.position)
@@ -91,7 +94,7 @@ class SpotStrategy(BaseStrategy):
             # - Take mean reversion trades
             # - Execute large orders with less slippage            pass
             action = "buy"
-            size = min(best_ask.quantity, self.risk_manager.max_position_size)
+            size = min(best_ask.quantity, update.instrument.max_size)
         elif spread_percentage >= self.max_spread and self.position is None:
             # Market might be volatile or illiquid
             # Consider:
@@ -99,8 +102,7 @@ class SpotStrategy(BaseStrategy):
             # - Widening stop losses
             # - Pausing new trades
             # - Looking for arbitrage opportunities
-            pass
-            # action = "sell"
-            # size = min(best_bid.quantity, self.risk_manager.max_position_size)
+            action = "sell"
+            size = min(best_bid.quantity, update.instrument.max_size)
 
         return Signal(action, size)

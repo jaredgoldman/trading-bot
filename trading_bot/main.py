@@ -2,7 +2,6 @@ from trading_bot.exchange import Binance, Exchange
 from trading_bot.execution import Execution
 from trading_bot.config import Config
 from trading_bot.utils import Logger
-from threading import Timer
 from typing import Type
 import time
 

@@ -2,6 +2,7 @@ from trading_bot.types import OrderBookUpdate, MarketDataObserver
 from trading_bot.config import Config
 from trading_bot.risk import RiskManager
 from trading_bot.strategy import SpotStrategy
+from trading_bot.config import Config
 import logging
 
 logger = logging.getLogger(__name__)
@@ -12,9 +13,7 @@ class Execution(MarketDataObserver):
 
     def __init__(self):
         # Initialize risk manager with example parameters
-        risk_manager = RiskManager(
-            max_position_size=1.0, max_drawdown=2.0, stop_loss_pct=1.0
-        )
+        risk_manager = RiskManager()
 
         # Initialize strategy with risk manager
         self.spot_strategy = SpotStrategy(

@@ -1,22 +1,32 @@
-from typing import Dict, Callable, Any
-from trading_bot.types import Instrument, InstrumentConfig, StrategyConfig
+from typing import Dict, Callable
+from trading_bot.types import Instrument, StrategyConfig
 
 
 class Config:
     """Configuration class for the trading bot"""
 
-    INSTRUMENTS: Dict[str, InstrumentConfig] = {
-        "BTC_USD": InstrumentConfig(
+    INSTRUMENTS: Dict[str, Instrument] = {
+        "BTC_USD": Instrument(
+            name="BTC_USD",
+            base_asset="BTC",
+            quote_asset="USD",
             buy_threshold=67434,
             sell_threshold=67450,
             min_size_usd=30,
             max_size_usd=100,
+            max_drawdown=2.0,
+            stop_loss_pct=1.0,
         ),
-        "ETH_USD": InstrumentConfig(
+        "ETH_USD": Instrument(
+            name="ETH_USD",
+            base_asset="ETH",
+            quote_asset="USD",
             buy_threshold=2647,
             sell_threshold=2647,
             min_size_usd=30,
             max_size_usd=100,
+            max_drawdown=2.0,
+            stop_loss_pct=1.0,
         ),
     }
 
@@ -28,35 +38,25 @@ class Config:
 
     @classmethod
     def get_strategies(cls):
+        """Return the available strategies"""
         return cls.STRATEGIES
-
-    @classmethod
-    def as_dict(cls) -> Dict[str, Any]:
-        return {
-            key: value
-            for key, value in cls.__dict__.items()
-            if not key.startswith("__") and not callable(value)
-        }
 
     @classmethod
     def process_instruments(
         cls, normalize_symbol: Callable[[str], str]
     ) -> dict[str, Instrument]:
-        instruments = {}
-        for symbol, config in cls.INSTRUMENTS.items():
-            base_asset, quote_asset = symbol.split("_")
-            name = normalize_symbol(f"{base_asset}{quote_asset}")
-            base_asset = normalize_symbol(base_asset)
-            quote_asset = normalize_symbol(quote_asset)
-            instruments.update(
-                {
-                    name: Instrument(
-                        name,
-                        base_asset,
-                        quote_asset,
-                        config.buy_threshold,
-                        config.sell_threshold,
-                    )
-                }
+        """Process instruments in config using the provided exchange-specific symbol normalizer"""
+        return {
+            normalize_symbol(config.name): Instrument(
+                normalize_symbol(config.name),
+                normalize_symbol(config.base_asset),
+                normalize_symbol(config.quote_asset),
+                config.buy_threshold,
+                config.sell_threshold,
+                config.min_size_usd,
+                config.max_size_usd,
+                config.max_drawdown,
+                config.stop_loss_pct,
             )
-        return instruments
+            for config in cls.INSTRUMENTS.values()
+        }

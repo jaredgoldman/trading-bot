@@ -14,6 +14,10 @@ class Instrument:
     quote_asset: str
     buy_threshold: float
     sell_threshold: float
+    min_size: float
+    max_size: float
+    max_drawdown: float
+    stop_loss_pct: float
 
 
 @dataclass(order=True)
@@ -37,14 +41,6 @@ class Position:
     size: float
     entry_price: float
     side: str  # 'long' or 'short'
-
-
-@dataclass
-class InstrumentConfig:
-    buy_threshold: float
-    sell_threshold: float
-    min_size_usd: float
-    max_size_usd: float
 
 
 @dataclass
